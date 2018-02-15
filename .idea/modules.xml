@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/dropwizard-jdbi3-transactions.iml" filepath="$PROJECT_DIR$/dropwizard-jdbi3-transactions.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dropwizard-jdbi3-transactions-core/dropwizard-jdbi3-transactions-core.iml" filepath="$PROJECT_DIR$/dropwizard-jdbi3-transactions-core/dropwizard-jdbi3-transactions-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dropwizard-jdbi3-transactions-test/dropwizard-jdbi3-transactions-test.iml" filepath="$PROJECT_DIR$/dropwizard-jdbi3-transactions-test/dropwizard-jdbi3-transactions-test.iml" />
+    </modules>
+  </component>
+</project>
