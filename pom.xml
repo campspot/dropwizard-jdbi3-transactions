@@ -13,6 +13,14 @@
         <module>dropwizard-jdbi3-transactions-test</module>
     </modules>
 
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>campspot-releases</name>
+            <url>https://campspot.jfrog.io/campspot/libs-release-local</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -75,6 +83,18 @@
                 <configuration>
                     <jvmTarget>1.8</jvmTarget>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
