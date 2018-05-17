@@ -23,7 +23,9 @@ class TransactionAspect(private val dbis: Map<String, Jdbi>, private val daoMana
 
   fun afterEnd() {
     try {
-      handle?.commit()
+      if (handle?.isClosed == false) {
+        handle!!.commit()
+      }
     } catch (e: Exception) {
       onError()
       throw e
@@ -32,7 +34,9 @@ class TransactionAspect(private val dbis: Map<String, Jdbi>, private val daoMana
 
   fun onError() {
     try {
-      handle?.rollback()
+      if (handle?.isClosed == false) {
+        handle!!.rollback()
+      }
       daoManager.clear()
     } finally {
       onFinish()
@@ -40,6 +44,8 @@ class TransactionAspect(private val dbis: Map<String, Jdbi>, private val daoMana
   }
 
   fun onFinish() {
-    handle?.close()
+    if (handle?.isClosed == false) {
+      handle?.close()
+    }
   }
 }

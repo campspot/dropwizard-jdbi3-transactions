@@ -19,7 +19,6 @@ open class DAOManager {
     var daoInstance = daoMap[dao.qualifiedName]
     val transactionInstance = transaction.get()
 
-
     if (daoInstance == null) {
       daoInstance = transactionInstance.attach(dao.java)
       daoMap[dao.qualifiedName ?: "none"] = daoInstance
