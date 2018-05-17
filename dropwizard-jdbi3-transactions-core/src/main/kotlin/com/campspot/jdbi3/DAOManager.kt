@@ -14,10 +14,11 @@ open class DAOManager {
     return transaction
   }
 
-  open operator fun <T: DAO> get(dao: KClass<T>): T {
+  open operator fun <T : DAO> get(dao: KClass<T>): T {
     val daoMap = daoInstances.get()
     var daoInstance = daoMap[dao.qualifiedName]
     val transactionInstance = transaction.get()
+
 
     if (daoInstance == null) {
       daoInstance = transactionInstance.attach(dao.java)
@@ -29,8 +30,8 @@ open class DAOManager {
   }
 
   fun clear() {
-    transaction.remove()
     daoInstances.remove()
+    transaction.remove()
   }
 }
 
