@@ -1,9 +1,12 @@
 package com.campspot.jdbi3
 
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.Jdbi
 import kotlin.reflect.KClass
 
-open class DAOManager {
+open class DAOManager(
+  private val jdbi: Jdbi
+) {
   private val transaction = ThreadLocal<Handle>()
   private val daoInstances = ThreadLocal<HashMap<String, DAO>>()
 
