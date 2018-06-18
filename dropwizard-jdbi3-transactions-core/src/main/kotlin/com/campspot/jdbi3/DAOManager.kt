@@ -2,6 +2,7 @@ package com.campspot.jdbi3
 
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.sqlobject.kotlin.onDemand
 import kotlin.reflect.KClass
 
 open class DAOManager(
@@ -29,6 +30,10 @@ open class DAOManager(
 
     @Suppress("UNCHECKED_CAST")
     return daoInstance as T
+  }
+
+  open fun <T : DAO> getWithoutTransaction(dao: KClass<T>): T {
+    return jdbi.onDemand(dao.java)
   }
 
   fun clear() {
