@@ -17,4 +17,8 @@ class TestDAOManager(jdbi: Jdbi): DAOManager(jdbi) {
     @Suppress("UNCHECKED_CAST")
     return mocks[dao] as T
   }
+
+  override fun <T : DAO> getWithoutTransaction(dao: KClass<T>): T {
+    return get(dao)
+  }
 }
