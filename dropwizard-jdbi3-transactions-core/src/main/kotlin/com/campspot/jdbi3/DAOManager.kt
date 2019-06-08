@@ -2,14 +2,13 @@ package com.campspot.jdbi3
 
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
-import org.jdbi.v3.sqlobject.kotlin.onDemand
 import kotlin.reflect.KClass
 
 open class DAOManager(
   private val jdbi: Jdbi
 ) {
-  private val transaction = ThreadLocal<Handle>()
-  private val daoInstances = ThreadLocal<HashMap<String, DAO>>()
+  protected val transaction = ThreadLocal<Handle>()
+  protected val daoInstances = ThreadLocal<HashMap<String, DAO>>()
 
   fun setupWithTransaction(transaction: Handle): Handle {
     this.transaction.set(transaction)
