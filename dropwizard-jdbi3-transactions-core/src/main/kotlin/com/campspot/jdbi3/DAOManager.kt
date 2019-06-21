@@ -17,11 +17,6 @@ open class DAOManager(
     return transaction
   }
 
-  fun setupWithTransaction(): Handle {
-    val transaction: Handle = jdbi.open()
-    return setupWithTransaction(transaction)
-  }
-
   open operator fun <T : DAO> get(dao: KClass<T>): T {
     val daoMap = daoInstances.get()
     var daoInstance = daoMap[dao.qualifiedName]
