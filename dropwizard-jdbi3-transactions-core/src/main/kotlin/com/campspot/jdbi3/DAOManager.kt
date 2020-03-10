@@ -7,8 +7,8 @@ import kotlin.reflect.KClass
 open class DAOManager(
   private val jdbi: Jdbi
 ) {
-  protected val transaction = ThreadLocal<Handle>()
-  protected val daoInstances = ThreadLocal<HashMap<String, DAO>>()
+  val transaction = ThreadLocal<Handle>()
+  val daoInstances = ThreadLocal<HashMap<String, DAO>>()
 
   fun setupWithTransaction(transaction: Handle): Handle {
     this.transaction.set(transaction)
