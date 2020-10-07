@@ -1,2 +1,10 @@
 target/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/codestream.xml
+.idea/dictionaries
+.idea/shelf
 .idea/libraries
+.idea/datasources*
+.idea/encodings.xml
+.idea/jarRepositories.xml
