@@ -20,7 +20,7 @@ class TransactionApplicationListener(private val daoManager: DAOManager) : Appli
     dbis[name] = jdbi
   }
 
-  private class TransactionEventListener internal constructor(
+  private class TransactionEventListener(
     private val methodMap: ConcurrentMap<ResourceMethod, InTransaction?>,
     daoManager: DAOManager,
     dbis: Map<String, Jdbi>

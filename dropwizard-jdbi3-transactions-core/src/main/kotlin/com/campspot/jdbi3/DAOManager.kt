@@ -4,11 +4,20 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import kotlin.reflect.KClass
 
-open class DAOManager(
-  private val jdbi: Jdbi
-) {
-  val transaction = ThreadLocal<Handle>()
-  val daoInstances = ThreadLocal<HashMap<String, DAO>>()
+const val DEFAULT = "db"
+
+open class DAOManager {
+  private val jdbis: Map<String, Jdbi>
+  private val transaction = ThreadLocal<Handle>()
+  private val daoInstances = ThreadLocal<HashMap<String, DAO>>()
+
+  constructor(jdbis: Map<String, Jdbi>) {
+    this.jdbis = jdbis
+  }
+
+  constructor(jdbi: Jdbi) {
+    jdbis = mapOf(DEFAULT to jdbi)
+  }
 
   fun setupWithTransaction(transaction: Handle): Handle {
     this.transaction.set(transaction)
@@ -18,7 +27,15 @@ open class DAOManager(
   }
 
   fun setupWithTransaction(): Handle {
-    val transaction: Handle = jdbi.open()
+    if (jdbis.size > 1) {
+      throw RuntimeException("name required for multiple databases")
+    }
+
+    return setupWithTransaction(DEFAULT)
+  }
+
+  fun setupWithTransaction(name: String): Handle {
+    val transaction: Handle = jdbis.getValue(name).open()
     return setupWithTransaction(transaction)
   }
 
@@ -37,7 +54,15 @@ open class DAOManager(
   }
 
   open fun <T : DAO> getWithoutTransaction(dao: KClass<T>): T {
-    return jdbi.onDemand(dao.java)
+    if (jdbis.size > 1) {
+      throw RuntimeException("name required for multiple databases")
+    }
+
+    return getWithoutTransaction(DEFAULT, dao)
+  }
+
+  open fun <T : DAO> getWithoutTransaction(name: String, dao: KClass<T>): T {
+    return jdbis.getValue(name).onDemand(dao.java)
   }
 
   fun clear() {
