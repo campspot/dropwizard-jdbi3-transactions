@@ -69,5 +69,19 @@ open class DAOManager {
     daoInstances.remove()
     transaction.remove()
   }
-}
 
+  fun<T> executeInTransaction(callback: () -> T): T {
+    val handle = setupWithTransaction()
+    val result: T;
+    try {
+      result = callback()
+      handle.commit();
+      return result;
+    } catch (exception: Exception) {
+      handle.rollback();
+      throw exception;
+    } finally {
+      handle.close();
+    }
+  }
+}
