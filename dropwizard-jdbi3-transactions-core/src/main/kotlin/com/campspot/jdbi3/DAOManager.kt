@@ -8,8 +8,8 @@ const val DEFAULT = "db"
 
 open class DAOManager {
   private val jdbis: Map<String, Jdbi>
-  private val transaction = ThreadLocal<Handle>()
-  private val daoInstances = ThreadLocal<HashMap<String, DAO>>()
+  val transaction = ThreadLocal<Handle>()
+  val daoInstances = ThreadLocal<HashMap<String, DAO>>()
 
   constructor(jdbis: Map<String, Jdbi>) {
     this.jdbis = jdbis
