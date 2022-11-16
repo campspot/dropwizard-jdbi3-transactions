@@ -6,6 +6,7 @@ import org.glassfish.jersey.server.monitoring.ApplicationEventListener
 import org.glassfish.jersey.server.monitoring.RequestEvent
 import org.glassfish.jersey.server.monitoring.RequestEventListener
 import org.jdbi.v3.core.Jdbi
+import org.slf4j.LoggerFactory
 import java.util.HashMap
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
@@ -26,6 +27,7 @@ class TransactionApplicationListener(private val daoManager: DAOManager) : Appli
     dbis: Map<String, Jdbi>
   ) : RequestEventListener {
     private val transactionAspect: TransactionAspect = TransactionAspect(dbis, daoManager)
+    private var logger = LoggerFactory.getLogger(this.javaClass)
 
     override fun onEvent(event: RequestEvent) {
       val eventType = event.type
@@ -35,6 +37,7 @@ class TransactionApplicationListener(private val daoManager: DAOManager) : Appli
       } else if (eventType == RequestEvent.Type.RESP_FILTERS_START) {
         transactionAspect.afterEnd()
       } else if (eventType == RequestEvent.Type.ON_EXCEPTION) {
+        logger.error("exception event", event.exception);
         transactionAspect.onError()
       } else if (eventType == RequestEvent.Type.FINISHED) {
         transactionAspect.onFinish()
