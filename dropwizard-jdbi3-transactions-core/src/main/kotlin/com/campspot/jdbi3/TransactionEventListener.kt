@@ -39,9 +39,9 @@ class TransactionApplicationListener @JvmOverloads constructor(private val daoMa
         transactionAspect.afterEnd()
       } else if (eventType == RequestEvent.Type.ON_EXCEPTION) {
         if (ignoredExceptionClasses.contains(event.exception.javaClass)) {
-          logger.error("exception event", event.exception);
-        } else {
           logger.error("exception message {}", event.exception.message);
+        } else {
+          logger.error("exception event", event.exception);
         }
         transactionAspect.onError()
       } else if (eventType == RequestEvent.Type.FINISHED) {
