@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap
 import javax.ws.rs.ext.Provider
 
 @Provider
-class TransactionApplicationListener(private val daoManager: DAOManager) : ApplicationEventListener {
+class TransactionApplicationListener @JvmOverloads constructor(private val daoManager: DAOManager, private val ignoredExceptionClasses: List<Class<*>> = emptyList()) : ApplicationEventListener {
   private val methodMap = ConcurrentHashMap<ResourceMethod, InTransaction?>()
   private val dbis = HashMap<String, Jdbi>()
 
@@ -24,7 +24,8 @@ class TransactionApplicationListener(private val daoManager: DAOManager) : Appli
   private class TransactionEventListener(
     private val methodMap: ConcurrentMap<ResourceMethod, InTransaction?>,
     daoManager: DAOManager,
-    dbis: Map<String, Jdbi>
+    dbis: Map<String, Jdbi>,
+    private val ignoredExceptionClasses: List<Class<*>>
   ) : RequestEventListener {
     private val transactionAspect: TransactionAspect = TransactionAspect(dbis, daoManager)
     private var logger = LoggerFactory.getLogger(this.javaClass)
@@ -37,7 +38,11 @@ class TransactionApplicationListener(private val daoManager: DAOManager) : Appli
       } else if (eventType == RequestEvent.Type.RESP_FILTERS_START) {
         transactionAspect.afterEnd()
       } else if (eventType == RequestEvent.Type.ON_EXCEPTION) {
-        logger.error("exception event", event.exception);
+        if (ignoredExceptionClasses.contains(event.exception.javaClass)) {
+          logger.error("exception event", event.exception);
+        } else {
+          logger.error("exception message {}", event.exception.message);
+        }
         transactionAspect.onError()
       } else if (eventType == RequestEvent.Type.FINISHED) {
         transactionAspect.onFinish()
@@ -56,7 +61,7 @@ class TransactionApplicationListener(private val daoManager: DAOManager) : Appli
   override fun onEvent(event: ApplicationEvent) {}
 
   override fun onRequest(event: RequestEvent): RequestEventListener {
-    return TransactionEventListener(methodMap, daoManager, dbis)
+    return TransactionEventListener(methodMap, daoManager, dbis, ignoredExceptionClasses)
   }
 }
 
