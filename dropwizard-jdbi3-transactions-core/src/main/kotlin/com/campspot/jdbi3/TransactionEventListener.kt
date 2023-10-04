@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap
 import javax.ws.rs.ext.Provider
 
 @Provider
-class TransactionApplicationListener @JvmOverloads constructor(private val daoManager: DAOManager, private val ignoredExceptionClasses: List<Class<*>> = emptyList()) : ApplicationEventListener {
+class TransactionApplicationListener<out T: Throwable> @JvmOverloads constructor(private val daoManager: DAOManager, private val ignoredExceptionClasses: List<Class<T>> = emptyList()) : ApplicationEventListener {
   private val methodMap = ConcurrentHashMap<ResourceMethod, InTransaction?>()
   private val dbis = HashMap<String, Jdbi>()
 
@@ -21,11 +21,11 @@ class TransactionApplicationListener @JvmOverloads constructor(private val daoMa
     dbis[name] = jdbi
   }
 
-  private class TransactionEventListener(
+  private class TransactionEventListener<out T: Throwable>(
     private val methodMap: ConcurrentMap<ResourceMethod, InTransaction?>,
     daoManager: DAOManager,
     dbis: Map<String, Jdbi>,
-    private val ignoredExceptionClasses: List<Class<*>>
+    private val ignoredExceptionClasses: List<Class<T>>
   ) : RequestEventListener {
     private val transactionAspect: TransactionAspect = TransactionAspect(dbis, daoManager)
     private var logger = LoggerFactory.getLogger(this.javaClass)
@@ -38,11 +38,22 @@ class TransactionApplicationListener @JvmOverloads constructor(private val daoMa
       } else if (eventType == RequestEvent.Type.RESP_FILTERS_START) {
         transactionAspect.afterEnd()
       } else if (eventType == RequestEvent.Type.ON_EXCEPTION) {
-        if (ignoredExceptionClasses.contains(event.exception.javaClass)) {
-          logger.error("exception message {}", event.exception.message);
-        } else {
-          logger.error("exception event", event.exception);
+        try {
+          var exceptionClass: Class<T>? = event.exception.javaClass as Class<T>
+          if (event.exception.cause != null) {
+            exceptionClass = event.exception.cause?.javaClass as Class<T>
+          }
+
+          if (exceptionClass != null && ignoredExceptionClasses.contains(exceptionClass)) {
+            logger.error("exception message {}", event.exception.message);
+          } else {
+            logger.error("exception event", event.exception);
+          }
+        } catch (e: Exception) {
+          // Just in case any of the above logging blows up, we still want to invoke the `onError` below
+          e.printStackTrace()
         }
+
         transactionAspect.onError()
       } else if (eventType == RequestEvent.Type.FINISHED) {
         transactionAspect.onFinish()
